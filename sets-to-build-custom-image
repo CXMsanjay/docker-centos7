@@ -1,0 +1,39 @@
+To create your own docker images, follow below steps -
+
+1) Install a centos6 or 7 machine with minimal installation.
+
+2) Follow below steps on the newly installed machine -
+# yum install epel-release
+
+3) # vim CentOS-Base.repo
+---
+[centosplus]
+name=CentOS-$releasever - Plus
+mirrorlist=http://mirrorlist.centos.org/?
+release=$releasever&arch=$basearch&repo=centosplus&infra=$infra
+#baseurl=http://mirror.centos.org/centos/$releasever/centosplus/$basearch/
+gpgcheck=1
+enabled=1                                                                   ← Was 0, make 1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+---
+
+4) # yum install docker
+5) # systemctl start docker
+
+6) # vim CentOS-Base.repo
+:%s/$releasever/7/g
+:%s/$basearch/x86_64/g
+
+7) # mkdir /root/scripts
+
+8) # cd /root/scripts
+
+9) From below link, download the centos7.sh script -
+https://github.com/CXMsanjay/docker-centos7/blob/master/centos7.sh
+
+10) # chmod +x create-image.sh
+
+11) # ./create-image.sh centos
+
+12) This should create a docker image which you can see in below command -
+# docker images -a
