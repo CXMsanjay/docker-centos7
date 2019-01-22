@@ -1,0 +1,41 @@
+To use systemd within centos 7 docker image, follow below steps -
+
+[1] # cat Dockerfile 
+FROM yogi9312/centos:7
+MAINTAINER “you” your@email.here
+ENV container docker
+RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in ; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done);
+RUN rm -rf /lib/systemd/system/multi-user.target.wants/;
+RUN rm -rf /etc/systemd/system/.wants/;
+RUN rm -rf /lib/systemd/system/local-fs.target.wants/;
+RUN rm -rf /lib/systemd/system/sockets.target.wants/udev;
+RUN rm -rf /lib/systemd/system/sockets.target.wants/initctl;
+RUN rm -rf /lib/systemd/system/basic.target.wants/;
+RUN rm -rf /lib/systemd/system/anaconda.target.wants/*;
+VOLUME [ “/sys/fs/cgroup” ]
+ENTRYPOINT ["/usr/sbin/init"]
+RUN rm -rf /lib/systemd/system/sockets.target.wants/initctl;
+RUN rm -rf /lib/systemd/system/basic.target.wants/;
+RUN rm -rf /lib/systemd/system/anaconda.target.wants/*;
+RUN yum install openssh* -y
+RUN yum install wget initscripts java-1.8.0-openjdk -y
+RUN wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat/jenkins.repo
+RUN rpm --import https://pkg.jenkins.io/redhat/jenkins.io.key
+RUN yum install jenkins -y
+VOLUME [ “/sys/fs/cgroup” ]
+CMD ["/usr/sbin/init"]
+
+[2] Then build the container using in the dir you have created the file (be sure no other files are inside, as they will be taken into the context and may cause troubles :wink: )
+# docker build --rm -t c7-systemd . (c7-systemd can be replaced with other name)
+
+[3] Then run the image with:
+# docker run -itd --privileged --name=test2 c7-systemd
+
+[4] Once the container named test1 is launch, start the ssh daemon -
+# docker exec test2 systemctl start sshd
+
+[5] Get the IP address of the container -
+# docker exec test2 cat /etc/hosts
+
+[6] Take ssh of the server and start working -
+# ssh root@IP            <-- Password of root is redhat
